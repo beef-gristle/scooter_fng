@@ -10,11 +10,7 @@
 #include <game/version.h>
 #include <game/collision.h>
 #include <game/gamecore.h>
-#include "gamemodes/fng2.h"
-#include "gamemodes/fng2solo.h"
-#include "gamemodes/fng2boom.h"
-#include "gamemodes/fng2boomsolo.h"
-#include "gamemodes/fng2_4teams.h"
+#include "gamemodes/fng2_types.h"
 #include <cstdint>
 #include <cctype>
 
@@ -1043,11 +1039,15 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			int64 Now = Server()->Tick();
 			pPlayer->m_LastVoteTry = Now;
-			if(pPlayer->GetTeam() == TEAM_SPECTATORS)
-			{
-				SendChatTarget(ClientID, "Spectators aren't allowed to start a vote.");
-				return;
-			}
+
+			/* Maybe we could allow spectators to start certain votes, but not all? */
+			/* Though I'm not sure what would be the criteria for that */
+			//
+			// if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+			// {
+			// 	SendChatTarget(ClientID, "Spectators aren't allowed to start a vote.");
+			// 	return;
+			// }
 
 			if(m_VoteCloseTime)
 			{
@@ -2416,12 +2416,14 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("force_vote", "ss?r", CFGFLAG_SERVER, ConForceVote, this, "Force a voting option");
 	Console()->Register("clear_votes", "", CFGFLAG_SERVER, ConClearVotes, this, "Clears the voting options");
 	Console()->Register("vote", "r", CFGFLAG_SERVER, ConVote, this, "Force a vote to yes/no");
-    
+
     //added by Scooter5561
     Console()->Register("toggle_dyncam", "i", CFGFLAG_SERVER, CGameContext::ConToggleDyncam, this, "Enable or disable dynamic camera draw distances");
-    Console()->Register("mute", "ii", CFGFLAG_SERVER, ConMute, this, "Mute a player from sending chat messages");
+    Console()->Register("mute", "i", CFGFLAG_SERVER, ConMute, this, "Mute a player from sending chat messages");
     Console()->Register("unmute", "i", CFGFLAG_SERVER, ConUnmute, this, "Unmute a player by ID");
 
+	// Added by Pig-Eye
+	Console()->Register("gamemode", "?s", CFGFLAG_SERVER, ConChangeGamemode, this, "Change the gamemode");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
@@ -2493,24 +2495,19 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	m_Collision.Init(&m_Layers);
 
 	// select gametype
-	if (str_comp(m_Config->m_SvGametype, "fng2") == 0)
-		m_pController = new CGameControllerFNG2(this);
-	else if (str_comp(m_Config->m_SvGametype, "fng2solo") == 0)
-		m_pController = new CGameControllerFNG2Solo(this);
-	else if (str_comp(m_Config->m_SvGametype, "fng2boom") == 0)
-		m_pController = new CGameControllerFNG2Boom(this);
-	else if (str_comp(m_Config->m_SvGametype, "fng2boomsolo") == 0)
-		m_pController = new CGameControllerFNG2BoomSolo(this);
-	else if (str_comp(m_Config->m_SvGametype, "fng24teams") == 0)
-		m_pController = new CGameControllerFNG24Teams(this);
-	else 
+	bool found = false;
+	for (auto& type : fng_gametypes) {
+		if (str_comp(m_Config->m_SvGametype, type.gametype) == 0) {
+			m_pController = type.s_constructor(this);
+			found = true;
+		}
+	}
+	if (!found) {
 #define CONTEXT_INIT_WITHOUT_CONFIG
 #include "gamecontext_additional_gametypes.h"
 #undef CONTEXT_INIT_WITHOUT_CONFIG
 		m_pController = new CGameControllerFNG2(this);
-		
-	if(m_Config->m_SvEmoteWheel)
-		m_pController->m_pGameType = "fng2+";
+	}
 
 	// create entities from map
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
@@ -2581,22 +2578,21 @@ void CGameContext::OnInit(IKernel *pKernel, IMap* pMap, CConfiguration* pConfigF
 	} else {
 		pConfig = &Config;
 	}
-	
-	if (str_comp(pConfig->m_SvGametype, "fng2") == 0)
-		m_pController = new CGameControllerFNG2(this, *pConfig);
-	else if (str_comp(pConfig->m_SvGametype, "fng2solo") == 0)
-		m_pController = new CGameControllerFNG2Solo(this, *pConfig);
-	else if (str_comp(pConfig->m_SvGametype, "fng2boom") == 0)
-		m_pController = new CGameControllerFNG2Boom(this, *pConfig);
-	else if (str_comp(pConfig->m_SvGametype, "fng2boomsolo") == 0)
-		m_pController = new CGameControllerFNG2BoomSolo(this, *pConfig);
-	else if (str_comp(pConfig->m_SvGametype, "fng24teams") == 0)
-		m_pController = new CGameControllerFNG24Teams(this, *pConfig);
-	else 
-#include "gamecontext_additional_gametypes.h"
-		m_pController = new CGameControllerFNG2(this, *pConfig);
 
-	if(m_Config->m_SvEmoteWheel) m_pController->m_pGameType = "fng2+";
+	// select gametype
+	bool found = false;
+	for (auto& type : fng_gametypes) {
+		if (str_comp(m_Config->m_SvGametype, type.gametype) == 0) {
+			m_pController = type.c_constructor(this, *pConfig);
+			found = true;
+		}
+	}
+	if (!found) {
+#define CONTEXT_INIT_WITHOUT_CONFIG
+#include "gamecontext_additional_gametypes.h"
+#undef CONTEXT_INIT_WITHOUT_CONFIG
+		m_pController = new CGameControllerFNG2(this);
+	}
 	
 	// create all entities from the game layer
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
@@ -3462,6 +3458,55 @@ void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData)
     {
         pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "unmute", "player not muted");
     }
+}
+
+void CGameContext::ConChangeGamemode(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	const char *currentGametype = pSelf->GameType();
+	const char *targetGametype = pResult->GetString(0);
+
+	if (pResult->NumArguments() == 0) {
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "Current gamemode: %s", currentGametype);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "context", aBuf);
+
+		const int length = sizeof(fng_gametypes) / sizeof(fng_gametypes[0]);
+		char bBuf[21 + length * 11];
+		int totalLen = 0;
+		const char *str1 = "Available gamemodes:";
+#define CONCAT(string) str_copy((bBuf+totalLen), string, sizeof(bBuf) - totalLen);\
+totalLen += str_length(string);\
+bBuf[totalLen++] = ' ';
+		CONCAT(str1);
+		for (int i = 0; i < length; i++) {
+			CONCAT(fng_gametypes[i].gametype);
+		}
+#undef CONCAT
+		bBuf[--totalLen] = '\0';
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "context", bBuf);
+
+		return;
+	}
+
+	if (str_comp(currentGametype, targetGametype) == 0) {
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "The server's gamemode is already %s", currentGametype);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "context", aBuf);
+		return;
+	}
+
+	if (!isValidFNGType(targetGametype)) {
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%s is not a valid gamemode", targetGametype);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "context", aBuf);
+		return;
+	}
+
+	char aBuf[48];
+	str_format(aBuf, sizeof(aBuf), "sv_gametype %s; reload", targetGametype);
+	pSelf->Console()->ExecuteLine(aBuf);
 }
 
 

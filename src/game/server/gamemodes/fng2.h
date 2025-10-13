@@ -18,6 +18,10 @@ public:
 	virtual void DoWincheck();
 	
 	virtual void PostReset();
+
+	static CGameControllerFNG2* Construct(class CGameContext* pGameServer) {return new CGameControllerFNG2(pGameServer);};
+	static CGameControllerFNG2* Construct(class CGameContext* pGameServer, CConfiguration& pConfig) {return new CGameControllerFNG2(pGameServer, pConfig);};
+	static constexpr const char *g_Gametype = "fng2";
 protected:
 	void EndRound();	
 };

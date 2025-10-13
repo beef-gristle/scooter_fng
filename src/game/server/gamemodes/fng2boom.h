@@ -13,5 +13,9 @@ public:
 	CGameControllerFNG2Boom(class CGameContext* pGameServer);
 	CGameControllerFNG2Boom(class CGameContext* pGameServer, CConfiguration& pConfig);
 	virtual void OnCharacterSpawn(class CCharacter *pChr);
+
+	static CGameControllerFNG2* Construct(class CGameContext* pGameServer) {return new CGameControllerFNG2Boom(pGameServer);};
+	static CGameControllerFNG2* Construct(class CGameContext* pGameServer, CConfiguration& pConfig) {return new CGameControllerFNG2Boom(pGameServer, pConfig);};
+	static constexpr const char *g_Gametype = "fng2boom";
 };
 #endif

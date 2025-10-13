@@ -187,6 +187,8 @@ class CGameContext : public IGameServer
 	static void ConVote(IConsole::IResult *pResult, void *pUserData);
 	static void ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
+	static void ConChangeGamemode(IConsole::IResult *pResult, void *pUserData);
+
 	CGameContext(int Resetting);
 	CGameContext(int Resetting, CConfiguration* pConfig);
 	void Construct(int Resetting);
