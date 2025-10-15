@@ -739,13 +739,13 @@ void CCharacter::Tick()
 				CCharacter *pChr = pPlayer->GetCharacter();
 				if (pChr && pChr->IsFrozen() && pChr->m_FrozenBy != m_pPlayer->GetCID() && pChr->m_FrozenBy != -1 && GameServer()->m_apPlayers[pChr->m_FrozenBy]->GetCharacter()->m_Core.m_HookedPlayer == pChr->GetPlayer()->GetCID()) {
 					// hooking someone else's kill
-					if (m_UsableBlockSeconds <= 0.0) {
+					if (m_UsableBlockSeconds <= 0.0 || m_BlockDepleted) {
 						// no block time left, unhook the stolen kill
 						UnhookClient(m_LastHookedPlayer);
 
 						// send the stop blocking message to everyone
-						if ((Server()->Tick() - m_LastBlockMessage) > m_BlockMessageDelay)
-						{
+						// every m_BlockMessageDelay ticks (3 secs)
+						if ((Server()->Tick() - m_LastBlockMessage) > m_BlockMessageDelay) {
 							char aBuf[17 + MAX_NAME_LENGTH];
 							str_format(aBuf, sizeof(aBuf), "'%s' STOP BLOCKING!", Server()->ClientName(m_pPlayer->GetCID()));
 							GameServer()->SendChat(-1, CHAT_ALL, aBuf);
@@ -763,6 +763,8 @@ void CCharacter::Tick()
 		}
 	}
 	
+	// have a 1 second timeout for when usableBlockSeconds
+	// reaches 0
 	if (m_BlockDepleted) {
 		if (m_BlockRecharge < 1.0) {
 			m_BlockRecharge += 1.0 / Server()->TickSpeed();
