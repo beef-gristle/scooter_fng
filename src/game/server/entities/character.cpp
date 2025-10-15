@@ -737,14 +737,14 @@ void CCharacter::Tick()
 			// block tracking
 			if (GameServer()->m_pController->IsTeamplay() && pPlayer->GetTeam() != m_pPlayer->GetTeam()) {
 				CCharacter *pChr = pPlayer->GetCharacter();
-				if (pChr && pChr->m_FrozenBy != m_pPlayer->GetCID() && pChr->m_FrozenBy != -1 && GameServer()->m_apPlayers[pChr->m_FrozenBy]->GetCharacter()->m_Core.m_HookedPlayer == pChr->GetPlayer()->GetCID()) {
+				if (pChr && pChr->IsFrozen() && pChr->m_FrozenBy != m_pPlayer->GetCID() && pChr->m_FrozenBy != -1 && GameServer()->m_apPlayers[pChr->m_FrozenBy]->GetCharacter()->m_Core.m_HookedPlayer == pChr->GetPlayer()->GetCID()) {
 					// hooking someone else's kill
 					if (m_UsableBlockSeconds <= 0.0) {
 						// no block time left, unhook the stolen kill
 						UnhookClient(m_LastHookedPlayer);
 
 						// send the stop blocking message to everyone
-						if ((m_LastBlockMessage - Server()->Tick()) * Server()->TickSpeed() < m_BlockMessageDelay)
+						if ((Server()->Tick() - m_LastBlockMessage) > m_BlockMessageDelay)
 						{
 							char aBuf[17 + MAX_NAME_LENGTH];
 							str_format(aBuf, sizeof(aBuf), "'%s' STOP BLOCKING!", Server()->ClientName(m_pPlayer->GetCID()));
