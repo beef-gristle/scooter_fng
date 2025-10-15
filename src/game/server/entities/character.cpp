@@ -1226,7 +1226,7 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 		Destroy();
 		GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());
 	}
-
+m_Killer.m_KillerID = -1;
 }
 
 void CCharacter::Hit(int Killer, int Weapon)
