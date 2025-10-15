@@ -733,8 +733,33 @@ void CCharacter::Tick()
 					pChr->m_Killer.m_KillerID = m_LastHookedPlayer;
 				}
 			}
+
+			// block tracking
+			if (GameServer()->m_pController->IsTeamplay() && pPlayer->GetTeam() != m_pPlayer->GetTeam()) {
+				CCharacter *pChr = pPlayer->GetCharacter();
+				if (pChr->m_FrozenBy != m_pPlayer->GetCID() && pChr->m_FrozenBy != -1) {
+					// hooking someone else's kill
+					if (m_UsableBlockSeconds <= 0.0) {
+						// no block time left, unhook the stolen kill
+						UnhookClient(m_LastHookedPlayer);
+
+						// send the stop blocking message to everyone
+						char aBuf[17 + MAX_NAME_LENGTH];
+						str_format(aBuf, sizeof(aBuf), "'%s' STOP BLOCKING!", Server()->ClientName(m_pPlayer->GetCID()));
+						GameServer()->SendChat(-1, CHAT_ALL, aBuf);
+					}
+
+					// lose 1 second of block time every second
+					m_UsableBlockSeconds -= 1.0 / Server()->TickSpeed();
+				}
+			}
 		}
 	}
+	
+	// gain back 0.05 seconds of block time every second
+	// 40 seconds per full 2 second restore
+	m_UsableBlockSeconds += 0.05 / Server()->TickSpeed();
+
     if(m_pPlayer && m_pPlayer->m_EyeEmote >= 0)
     {
         int Until = (m_pPlayer->m_EyeEmoteDuration > 0)
