@@ -2424,6 +2424,7 @@ void CGameContext::OnConsoleInit()
 
 	// Added by Pig-Eye
 	Console()->Register("gamemode", "?s", CFGFLAG_SERVER, ConChangeGamemode, this, "Change the gamemode");
+	Console()->Register("makesay", "is", CFGFLAG_SERVER, ConMakeSay, this, "Force an unassuming client to say something probably bad");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
@@ -3507,6 +3508,32 @@ bBuf[totalLen++] = ' ';
 	char aBuf[48];
 	str_format(aBuf, sizeof(aBuf), "sv_gametype %s; reload", targetGametype);
 	pSelf->Console()->ExecuteLine(aBuf);
+}
+
+
+void CGameContext::ConMakeSay(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	int victimID = pResult->GetInteger(0);
+
+	// For messages with spaces, wrap them in double quotes
+	// e.g., makesay 0 "Hello world!"
+	const char *msg = pResult->GetString(1);
+
+	if (victimID < 0 || victimID >= MAX_CLIENTS)
+	{
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "makesay", "The ID must be between 0 and the maximum number of clients");
+		return;
+	}
+
+	if (!pSelf->m_apPlayers[victimID])
+	{
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "makesay", "There is no client with that ID");
+		return;
+	}
+
+	pSelf->SendChat(victimID, CHAT_ALL, msg);
 }
 
 

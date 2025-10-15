@@ -443,11 +443,12 @@ endif()
 ########################################################################
 
 set(EXPECTED_DATA
-  maps/4TeamsFNG_random.map
-  maps/4TeamsFNG.map
+#  maps/4TeamsFNG_random.map
+#  maps/4TeamsFNG.map
   maps/AliveFNG.map
-  maps/IIT_Edited.map
-  maps/openfng5Beat.map
+  maps/fng.map
+#  maps/IIT_Edited.map
+#  maps/openfng5Beat.map
   mapres/desert_mountains.png
   mapres/winter_doodads.png
   mapres/moon.png
@@ -490,6 +491,8 @@ foreach(datafile ${DATA})
   file(MAKE_DIRECTORY ${DESTINATION})
   file(COPY ${datafile} DESTINATION ${DESTINATION})
 endforeach()
+
+file(COPY autoexec.cfg DESTINATION ${PROJECT_BINARY_DIR})
 
 ########################################################################
 # CODE GENERATION
@@ -695,12 +698,13 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   gamecontext_additional_gametypes_includes.h
   gamecontroller.cpp
   gamecontroller.h
+  gamemodes/fng2_types.h
   gamemodes/fng2.cpp
   gamemodes/fng2.h
   gamemodes/fng2boom.cpp
   gamemodes/fng2boom.h
-  gamemodes/fng2_4teams.cpp
-  gamemodes/fng2_4teams.h
+#  gamemodes/fng2_4teams.cpp
+#  gamemodes/fng2_4teams.h
   gamemodes/fng2boomsolo.cpp
   gamemodes/fng2boomsolo.h
   gamemodes/fng2solo.cpp
