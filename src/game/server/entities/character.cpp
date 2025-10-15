@@ -1178,6 +1178,19 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 					GameServer()->CreateSoundGlobal(SOUND_CTF_GRAB_PL, m_pPlayer->GetCID());			
 				}
 			}
+        
+			// SPREE END MESSAGE
+			if(m_pPlayer && m_pPlayer->m_CurrentSpree >= 5 && pPlayerID != m_pPlayer->GetCID())
+			{
+				char aBuf[128];
+				str_format(aBuf, sizeof(aBuf), "'%s' spree of %d kills ended by '%s'!",
+					Server()->ClientName(m_pPlayer->GetCID()),
+					m_pPlayer->m_CurrentSpree,
+					Server()->ClientName(pPlayerID));
+				GameServer()->SendChat(-1, CHAT_ALL, aBuf);
+				if(m_pPlayer)
+					m_pPlayer->m_CurrentSpree = 0;
+			}
 		}
 		//if not frozen or selfkill
 		else {
@@ -1208,19 +1221,6 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 		// this is for auto respawn after 3 secs
 		m_pPlayer->m_DieTick = Server()->Tick();
         m_pPlayer->m_RespawnTick = Server()->Tick();
-        
-        // SPREE END MESSAGE
-        if(m_pPlayer && m_pPlayer->m_CurrentSpree >= 5 && pPlayerID != m_pPlayer->GetCID())
-        {
-            char aBuf[128];
-            str_format(aBuf, sizeof(aBuf), "'%s' spree of %d kills ended by '%s'!",
-                Server()->ClientName(m_pPlayer->GetCID()),
-                m_pPlayer->m_CurrentSpree,
-                Server()->ClientName(pPlayerID));
-            GameServer()->SendChat(-1, CHAT_ALL, aBuf);
-			if(m_pPlayer)
-				m_pPlayer->m_CurrentSpree = 0;
-		}
         
 		GameServer()->m_World.RemoveEntity(this);
 		Destroy();
