@@ -1,4 +1,7 @@
 build/
 datasrc/__pycache__/
-
+fng2_srv.exe
+.bam/
+objs/
+release.bat
 */.vs/
