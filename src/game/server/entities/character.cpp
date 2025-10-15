@@ -1218,9 +1218,9 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
                 m_pPlayer->m_CurrentSpree,
                 Server()->ClientName(pPlayerID));
             GameServer()->SendChat(-1, CHAT_ALL, aBuf);
-        }
-        if(m_pPlayer)
-            m_pPlayer->m_CurrentSpree = 0;
+			if(m_pPlayer)
+				m_pPlayer->m_CurrentSpree = 0;
+		}
         
 		GameServer()->m_World.RemoveEntity(this);
 		Destroy();
