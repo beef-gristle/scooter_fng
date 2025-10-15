@@ -1124,11 +1124,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					SendChatTarget(ClientID, "Invalid client id to kick");
 					return;
 				}
-				if(KickID == ClientID)
-				{
-					SendChatTarget(ClientID, "You can't kick yourself");
-					return;
-				}
+				// if(KickID == ClientID)
+				// {
+				// 	SendChatTarget(ClientID, "You can't kick yourself");
+				// 	return;
+				// }
 				if(Server()->IsAuthed(KickID))
 				{
 					SendChatTarget(ClientID, "You can't kick admins");
