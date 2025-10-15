@@ -744,9 +744,13 @@ void CCharacter::Tick()
 						UnhookClient(m_LastHookedPlayer);
 
 						// send the stop blocking message to everyone
-						char aBuf[17 + MAX_NAME_LENGTH];
-						str_format(aBuf, sizeof(aBuf), "'%s' STOP BLOCKING!", Server()->ClientName(m_pPlayer->GetCID()));
-						GameServer()->SendChat(-1, CHAT_ALL, aBuf);
+						if (m_LastBlockMessage < m_BlockMessageDelay)
+						{
+							char aBuf[17 + MAX_NAME_LENGTH];
+							str_format(aBuf, sizeof(aBuf), "'%s' STOP BLOCKING!", Server()->ClientName(m_pPlayer->GetCID()));
+							GameServer()->SendChat(-1, CHAT_ALL, aBuf);
+							m_LastBlockMessage = m_BlockMessageDelay;
+						}
 					}
 
 					// lose 1 second of block time every second (when blocking)
@@ -764,6 +768,10 @@ void CCharacter::Tick()
 	if (m_UsableBlockSeconds > m_BlockSecondsMax) {
 		m_UsableBlockSeconds = m_BlockSecondsMax;
 	}
+
+	m_LastBlockMessage++;
+	if (m_LastBlockMessage > m_BlockMessageDelay)
+		m_LastBlockMessage = m_BlockMessageDelay;
 
     if(m_pPlayer && m_pPlayer->m_EyeEmote >= 0)
     {
