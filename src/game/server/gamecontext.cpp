@@ -2424,7 +2424,7 @@ void CGameContext::OnConsoleInit()
 
 	// Added by Pig-Eye
 	Console()->Register("gamemode", "?s", CFGFLAG_SERVER, ConChangeGamemode, this, "Change the gamemode");
-	Console()->Register("makesay", "is", CFGFLAG_SERVER, ConMakeSay, this, "Force an unassuming client to say something probably bad");
+	Console()->Register("makesay", "ir", CFGFLAG_SERVER, ConMakeSay, this, "Force an unassuming client to say something probably bad");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
