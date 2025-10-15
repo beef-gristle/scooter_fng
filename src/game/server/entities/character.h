@@ -106,7 +106,7 @@ public:
 	float m_BlockSecondsMax = 2.0;
 
 	int m_LastBlockMessage = -1;
-	int m_BlockMessageDelay = 3;
+	int m_BlockMessageDelay = 3 * Server()->TickSpeed();
     
     //for tracking time while frozen
     int m_LastFrozenSecond = -1;
