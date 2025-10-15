@@ -744,7 +744,7 @@ void CCharacter::Tick()
 						UnhookClient(m_LastHookedPlayer);
 
 						// send the stop blocking message to everyone
-						if (m_LastBlockMessage < m_BlockMessageDelay)
+						if (m_LastBlockMessage <= m_BlockMessageDelay)
 						{
 							char aBuf[17 + MAX_NAME_LENGTH];
 							str_format(aBuf, sizeof(aBuf), "'%s' STOP BLOCKING!", Server()->ClientName(m_pPlayer->GetCID()));
@@ -769,7 +769,7 @@ void CCharacter::Tick()
 		m_UsableBlockSeconds = m_BlockSecondsMax;
 	}
 
-	m_LastBlockMessage++;
+	m_LastBlockMessage += 1 / Server()->TickSpeed();
 	if (m_LastBlockMessage > m_BlockMessageDelay)
 		m_LastBlockMessage = m_BlockMessageDelay;
 
