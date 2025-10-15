@@ -9,8 +9,6 @@
 #include "fng2boom.h"
 #include "fng2boomsolo.h"
 
-#include <string.h>
-
 struct {
 	const char *gametype;
 	CGameControllerFNG2* (*s_constructor)(CGameContext*);
