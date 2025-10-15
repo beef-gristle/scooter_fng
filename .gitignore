@@ -1,0 +1,4 @@
+build/
+datasrc/__pycache__/
+
+*/.vs/
