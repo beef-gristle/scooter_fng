@@ -737,7 +737,7 @@ void CCharacter::Tick()
 			// block tracking
 			if (GameServer()->m_pController->IsTeamplay() && pPlayer->GetTeam() != m_pPlayer->GetTeam()) {
 				CCharacter *pChr = pPlayer->GetCharacter();
-				if (pChr->m_FrozenBy != m_pPlayer->GetCID() && pChr->m_FrozenBy != -1) {
+				if (pChr && pChr->m_FrozenBy != m_pPlayer->GetCID() && pChr->m_FrozenBy != -1 && GameServer()->m_apPlayers[pChr->m_FrozenBy]->GetCharacter()->m_Core.m_HookedPlayer == pChr->GetPlayer()->GetCID()) {
 					// hooking someone else's kill
 					if (m_UsableBlockSeconds <= 0.0) {
 						// no block time left, unhook the stolen kill
@@ -749,7 +749,7 @@ void CCharacter::Tick()
 						GameServer()->SendChat(-1, CHAT_ALL, aBuf);
 					}
 
-					// lose 1 second of block time every second
+					// lose 1 second of block time every second (when blocking)
 					m_UsableBlockSeconds -= 1.0 / Server()->TickSpeed();
 				}
 			}
@@ -758,8 +758,12 @@ void CCharacter::Tick()
 	
 	// gain back 0.05 seconds of block time every second
 	// 40 seconds per full 2 second restore
-	if (m_UsableBlockSeconds + (m_BlockSecondsIncrease / Server()->TickSpeed()) < m_BlockSecondsMax)
-		m_UsableBlockSeconds += m_BlockSecondsIncrease / Server()->TickSpeed();
+	m_UsableBlockSeconds += m_BlockSecondsIncrease / Server()->TickSpeed();
+
+	// cap the usableBlockSeconds at blockSecondsMax
+	if (m_UsableBlockSeconds > m_BlockSecondsMax) {
+		m_UsableBlockSeconds = m_BlockSecondsMax;
+	}
 
     if(m_pPlayer && m_pPlayer->m_EyeEmote >= 0)
     {
