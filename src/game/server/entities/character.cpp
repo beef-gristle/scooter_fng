@@ -755,14 +755,27 @@ void CCharacter::Tick()
 
 					// lose 1 second of block time every second (when blocking)
 					m_UsableBlockSeconds -= 1.0 / Server()->TickSpeed();
+					if (m_UsableBlockSeconds <= 0.0) {
+						m_BlockDepleted = true;
+
+					}
 				}
 			}
 		}
 	}
 	
-	// gain back 0.05 seconds of block time every second
-	// 40 seconds per full 2 second restore
-	m_UsableBlockSeconds += m_BlockSecondsIncrease / Server()->TickSpeed();
+	if (m_BlockDepleted) {
+		if (m_BlockRecharge < 1.0) {
+			m_BlockRecharge += 1.0 / Server()->TickSpeed();
+		} else {
+			m_BlockDepleted = false;
+			m_BlockRecharge = 0.0;
+		}
+	} else {
+		// gain back 0.05 seconds of block time every second
+		// 40 seconds per full 2 second restore
+		m_UsableBlockSeconds += m_BlockSecondsIncrease / Server()->TickSpeed();
+	}
 
 	// cap the usableBlockSeconds at blockSecondsMax
 	if (m_UsableBlockSeconds > m_BlockSecondsMax) {

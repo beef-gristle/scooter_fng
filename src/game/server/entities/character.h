@@ -99,6 +99,8 @@ public:
     
     //for steal detection
     int m_FrozenBy = -1;
+	bool m_BlockDepleted = false;
+	float m_BlockRecharge = 0.0;
 	float m_UsableBlockSeconds = 1.0;
 	float m_BlockSecondsIncrease = 0.05;
 	float m_BlockSecondsMax = 2.0;
