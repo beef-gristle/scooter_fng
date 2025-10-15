@@ -102,6 +102,9 @@ public:
 	float m_UsableBlockSeconds = 1.0;
 	float m_BlockSecondsIncrease = 0.05;
 	float m_BlockSecondsMax = 2.0;
+
+	int m_LastBlockMessage = -1;
+	int m_BlockMessageDelay = 3;
     
     //for tracking time while frozen
     int m_LastFrozenSecond = -1;
