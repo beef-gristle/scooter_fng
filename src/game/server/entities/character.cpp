@@ -758,7 +758,8 @@ void CCharacter::Tick()
 	
 	// gain back 0.05 seconds of block time every second
 	// 40 seconds per full 2 second restore
-	m_UsableBlockSeconds += 0.05 / Server()->TickSpeed();
+	if (m_UsableBlockSeconds + (m_BlockSecondsIncrease / Server()->TickSpeed()) < m_BlockSecondsMax)
+		m_UsableBlockSeconds += m_BlockSecondsIncrease / Server()->TickSpeed();
 
     if(m_pPlayer && m_pPlayer->m_EyeEmote >= 0)
     {

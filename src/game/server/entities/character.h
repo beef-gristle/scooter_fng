@@ -99,7 +99,9 @@ public:
     
     //for steal detection
     int m_FrozenBy = -1;
-	float m_UsableBlockSeconds = 2.0;
+	float m_UsableBlockSeconds = 1.0;
+	float m_BlockSecondsIncrease = 0.05;
+	float m_BlockSecondsMax = 2.0;
     
     //for tracking time while frozen
     int m_LastFrozenSecond = -1;
