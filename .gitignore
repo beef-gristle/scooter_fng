@@ -4,4 +4,6 @@ fng2_srv.exe
 .bam/
 objs/
 release.bat
+stats.db
+roundstats.db
 */.vs/

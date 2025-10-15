@@ -1332,7 +1332,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
             if (From >= 0 && From < MAX_CLIENTS && GameServer()->m_apPlayers[From]) {
                 GameServer()->m_apPlayers[From]->m_Misses--;
 				GameServer()->CreateDamageInd(m_Pos, 0, 1, 1 - m_pPlayer->GetTeam(), m_pPlayer->GetCID(), GameServer()->m_apPlayers[From]->GetCID());
-				GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "TESTING", "i want to increase armor to 10 FROM TAKEDAMAGE");
+				//GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "TESTING", "i want to increase armor to 10 FROM TAKEDAMAGE");
 			}
             
             //for tracking times youve been frozen/froze others

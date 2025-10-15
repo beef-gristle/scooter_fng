@@ -254,7 +254,7 @@ void CPlayer::OnDisconnect(const char *pReason)
 {
     GameServer()->SavePlayerStatsToFile(this);
     GameServer()->SaveRoundStatsToFile(this);
-    GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "debug", "PLAYER DISCONNECTED");
+    //GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "debug", "PLAYER DISCONNECTED");
     if(m_pCharacter)
     {   
         if(m_pCharacter && m_pCharacter->IsFrozen())
