@@ -5,7 +5,7 @@
 #include <game/server/gamecontroller.h>
 #include <base/vmath.h>
 
-#include "fng2_define.h"
+#include "../fng2define.h"
 
 class CGameControllerFNG2 : public IGameController
 {

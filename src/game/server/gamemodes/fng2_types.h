@@ -10,7 +10,7 @@ class CGameControllerFNG2BoomSolo;
 
 #include <string.h>
 
-#include "fng2_define.h"
+#include "../fng2define.h"
 #include "fng2.h"
 #include "fng2solo.h"
 #include "fng2boom.h"
