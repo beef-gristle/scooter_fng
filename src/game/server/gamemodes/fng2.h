@@ -5,6 +5,8 @@
 #include <game/server/gamecontroller.h>
 #include <base/vmath.h>
 
+#include "fng2_define.h"
+
 class CGameControllerFNG2 : public IGameController
 {
 public:
@@ -21,8 +23,8 @@ public:
 
 	static CGameControllerFNG2* Construct(class CGameContext* pGameServer) {return new CGameControllerFNG2(pGameServer);};
 	static CGameControllerFNG2* Construct(class CGameContext* pGameServer, CConfiguration& pConfig) {return new CGameControllerFNG2(pGameServer, pConfig);};
-	static constexpr const char *g_Gametype = "fng2";
+	static constexpr const char *g_Gametype = fng_typenames[0];
 protected:
-	void EndRound();	
+	void EndRound();
 };
 #endif

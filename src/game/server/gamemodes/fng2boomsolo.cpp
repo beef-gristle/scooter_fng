@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 CGameControllerFNG2BoomSolo::CGameControllerFNG2BoomSolo(class CGameContext *pGameServer)
-: CGameControllerFNG2Solo((class CGameContext*)pGameServer)
+: CGameControllerFNG2((class CGameContext*)pGameServer)
 {
 	m_pGameType = g_Gametype;	
 
@@ -19,7 +19,7 @@ CGameControllerFNG2BoomSolo::CGameControllerFNG2BoomSolo(class CGameContext *pGa
 }
 
 CGameControllerFNG2BoomSolo::CGameControllerFNG2BoomSolo(class CGameContext *pGameServer, CConfiguration& pConfig)
-: CGameControllerFNG2Solo((class CGameContext*)pGameServer, pConfig)
+: CGameControllerFNG2((class CGameContext*)pGameServer, pConfig)
 {
 	m_pGameType = g_Gametype;	
 

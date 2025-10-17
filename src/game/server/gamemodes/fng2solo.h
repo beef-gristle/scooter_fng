@@ -16,7 +16,6 @@ public:
 
 	static CGameControllerFNG2* Construct(class CGameContext* pGameServer) {return new CGameControllerFNG2Solo(pGameServer);};
 	static CGameControllerFNG2* Construct(class CGameContext* pGameServer, CConfiguration& pConfig) {return new CGameControllerFNG2Solo(pGameServer, pConfig);};
-
-	static constexpr const char *g_Gametype = "fng2solo";
+	static constexpr const char *g_Gametype = fng_typenames[1];
 };
 #endif

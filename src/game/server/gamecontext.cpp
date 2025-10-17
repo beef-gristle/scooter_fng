@@ -2498,7 +2498,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	// select gametype
 	bool found = false;
 	for (auto& type : fng_gametypes) {
-		if (str_comp(m_Config->m_SvGametype, type.gametype) == 0) {
+		if (str_comp(m_Config->m_SvGametype, type.name) == 0) {
 			m_pController = type.s_constructor(this);
 			found = true;
 		}
@@ -2583,7 +2583,7 @@ void CGameContext::OnInit(IKernel *pKernel, IMap* pMap, CConfiguration* pConfigF
 	// select gametype
 	bool found = false;
 	for (auto& type : fng_gametypes) {
-		if (str_comp(m_Config->m_SvGametype, type.gametype) == 0) {
+		if (str_comp(m_Config->m_SvGametype, type.name) == 0) {
 			m_pController = type.c_constructor(this, *pConfig);
 			found = true;
 		}
@@ -3482,7 +3482,7 @@ totalLen += str_length(string);\
 bBuf[totalLen++] = ' ';
 		CONCAT(str1);
 		for (int i = 0; i < length; i++) {
-			CONCAT(fng_gametypes[i].gametype);
+			CONCAT(fng_gametypes[i].name);
 		}
 #undef CONCAT
 		bBuf[--totalLen] = '\0';

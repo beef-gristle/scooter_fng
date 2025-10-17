@@ -6,9 +6,8 @@
 #include <base/vmath.h>
 
 #include "fng2.h"
-#include "fng2solo.h"
 
-class CGameControllerFNG2BoomSolo : public CGameControllerFNG2Solo
+class CGameControllerFNG2BoomSolo : public CGameControllerFNG2
 {
 public:
 	CGameControllerFNG2BoomSolo(class CGameContext* pGameServer);
@@ -18,6 +17,6 @@ public:
 
 	static CGameControllerFNG2* Construct(class CGameContext* pGameServer) {return new CGameControllerFNG2BoomSolo(pGameServer);};
 	static CGameControllerFNG2* Construct(class CGameContext* pGameServer, CConfiguration& pConfig) {return new CGameControllerFNG2BoomSolo(pGameServer, pConfig);};
-	static constexpr const char *g_Gametype = "fng2boomsolo";
+	static constexpr const char *g_Gametype = fng_typenames[3];
 };
 #endif

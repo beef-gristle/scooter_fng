@@ -16,6 +16,6 @@ public:
 
 	static CGameControllerFNG2* Construct(class CGameContext* pGameServer) {return new CGameControllerFNG2Boom(pGameServer);};
 	static CGameControllerFNG2* Construct(class CGameContext* pGameServer, CConfiguration& pConfig) {return new CGameControllerFNG2Boom(pGameServer, pConfig);};
-	static constexpr const char *g_Gametype = "fng2boom";
+	static constexpr const char *g_Gametype = fng_typenames[2];
 };
 #endif
