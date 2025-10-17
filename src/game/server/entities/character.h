@@ -103,6 +103,8 @@ public:
 	float m_BlockRecharge = 0.0;
 	float m_UsableBlockSeconds = 0.0;
 	int m_LastBlockMessage = -1;
+
+	int m_StealsFrom[MAX_CLIENTS];
     
     // for tracking time while frozen
     int m_LastFrozenSecond = -1;
