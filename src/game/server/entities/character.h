@@ -97,21 +97,17 @@ public:
     void AC_AddAimSnap(vec2 Dir, int DtMs);
     bool AC_IsAimbot(vec2 ShotDir);
     
-    //for steal detection
+    // for steal detection and messaging
     int m_FrozenBy = -1;
 	bool m_BlockDepleted = false;
 	float m_BlockRecharge = 0.0;
-	float m_UsableBlockSeconds = 1.0;
-	float m_BlockSecondsIncrease = 0.05;
-	float m_BlockSecondsMax = 2.0;
-
+	float m_UsableBlockSeconds = 0.0;
 	int m_LastBlockMessage = -1;
-	int m_BlockMessageDelay = 3 * Server()->TickSpeed();
     
-    //for tracking time while frozen
+    // for tracking time while frozen
     int m_LastFrozenSecond = -1;
     
-    //for rq noob
+    // for rq noob
     int m_OwnerCID;
     bool m_IsFrozenNoob = false;
     char m_aOriginalName[MAX_NAME_LENGTH];

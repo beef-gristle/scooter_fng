@@ -2419,12 +2419,12 @@ void CGameContext::OnConsoleInit()
 
     //added by Scooter5561
     Console()->Register("toggle_dyncam", "i", CFGFLAG_SERVER, CGameContext::ConToggleDyncam, this, "Enable or disable dynamic camera draw distances");
-    Console()->Register("mute", "i", CFGFLAG_SERVER, ConMute, this, "Mute a player from sending chat messages");
+    Console()->Register("mute", "ii", CFGFLAG_SERVER, ConMute, this, "Mute a player from sending chat messages");
     Console()->Register("unmute", "i", CFGFLAG_SERVER, ConUnmute, this, "Unmute a player by ID");
 
 	// Added by Pig-Eye
 	Console()->Register("gamemode", "?s", CFGFLAG_SERVER, ConChangeGamemode, this, "Change the gamemode");
-	Console()->Register("makesay", "ir", CFGFLAG_SERVER, ConMakeSay, this, "Force an unassuming client to say something probably bad");
+	Console()->Register("makesay", "ir", CFGFLAG_SERVER, ConMakeSay, this, "Force an unassuming player to say something probably bad");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
