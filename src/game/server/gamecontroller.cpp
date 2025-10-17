@@ -74,6 +74,13 @@ IGameController::~IGameController()
 
 float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos)
 {
+	// for random respawns, dont compare them
+	// against distances from other characters
+	if (m_Config.m_SvRandomRespawn)
+	{
+		return (float)rand();
+	}
+
 	float Score = 0.0f;
 	CCharacter *pC = static_cast<CCharacter *>(GameServer()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
 	for(; pC; pC = (CCharacter *)pC->TypeNext())
