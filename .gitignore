@@ -1,9 +1,14 @@
+# Ignore build scripts, directories, and such
 build/
 datasrc/__pycache__/
 fng2_srv.exe
-.bam/
-objs/
 release.bat
+
+# Ignore local cache
+.bam/
+*/.vs/
+objs/
+
+# No need for server-specific stats in the main repo
 stats.db
 roundstats.db
-*/.vs/
