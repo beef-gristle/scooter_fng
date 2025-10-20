@@ -1064,12 +1064,14 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 					Server()->ClientName(m_FrozenBy),
 					pFreezer->m_Steals,
 					pFreezer->m_RoundSteals,
+					pPlayerID,
 					pFreChar->m_StealsFrom[pPlayerID]
 				);
 				str_format(kBuf, sizeof(kBuf), "'%s' stats: steals='%d', roundSteals='%d', stealsFrom(%d)='%d'",
 					Server()->ClientName(pPlayerID),
 					pKiller->m_Steals,
 					pKiller->m_RoundSteals,
+					m_FrozenBy,
 					pKilChar->m_StealsFrom[m_FrozenBy]
 				);
 				GameServer()->SendChat(-1, CHAT_ALL, fBuf);
@@ -1088,6 +1090,14 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 							// Freezer has already stolen kill(s) from killer;
 							// thus, they traded
 
+							// Update stat tracking
+							pFreezer->m_Steals--;
+							pKiller->m_StolenFrom--;
+							pFreezer->m_RoundSteals--;
+							pKiller->m_RoundStolenFrom--;
+
+							pFreezerChar->m_StealsFrom[pPlayerID]--;
+
 							// Announce the trade
 							char aBuf[MAX_INPUT_SIZE];
 							str_format(aBuf, sizeof(aBuf), "'%s' and '%s' traded kills (%d-%d)",
@@ -1096,22 +1106,7 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 								m_StealsFrom[m_FrozenBy],
 								pFreezerChar->m_StealsFrom[pPlayerID]);
 							GameServer()->SendChat(-1, CHAT_ALL, aBuf);
-
-							// Update stat tracking
-							pFreezer->m_Steals--;
-							pKiller->m_StolenFrom--;
-							pFreezer->m_RoundSteals--;
-							pKiller->m_RoundStolenFrom--;
-
-							pFreezerChar->m_StealsFrom[pPlayerID]--;
 						} else {
-							// Announce the steal
-							char aMsg[128];
-							str_format(aMsg, sizeof(aMsg), "'%s' stole '%s' kill!",
-									Server()->ClientName(pPlayerID),
-									Server()->ClientName(m_FrozenBy));
-							GameServer()->SendChat(-1, CHAT_ALL, aMsg);
-
 							// Update stat tracking
 							pKiller->m_Steals++;
 							pFreezer->m_StolenFrom++;
@@ -1121,6 +1116,13 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 							CCharacter *pKillerChar = pKiller->GetCharacter();
 							if (pKillerChar)
 								pKillerChar->m_StealsFrom[m_FrozenBy]++;
+							
+							// Announce the steal
+							char aMsg[128];
+							str_format(aMsg, sizeof(aMsg), "'%s' stole '%s' kill!",
+									Server()->ClientName(pPlayerID),
+									Server()->ClientName(m_FrozenBy));
+							GameServer()->SendChat(-1, CHAT_ALL, aMsg);
 						}
                     }
                 }
