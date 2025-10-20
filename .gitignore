@@ -9,6 +9,7 @@ release.bat
 */.vs/
 objs/
 
-# No need for server-specific stats in the main repo
+# No need for server-specific stats/settings in the main repo
 stats.db
 roundstats.db
+autoexec.cfg
