@@ -274,7 +274,7 @@ public:
 	// Constants regarding player blocking
 	float m_BlockSecondsIncrease = 0.05;
 	float m_BlockSecondsMax = 2.0;
-	int m_BlockMessageDelay = 3 * Server()->TickSpeed();
+	int m_BlockMessageDelay;
 
 	// helper functions
 	void MakeLaserTextPoints(vec2 pPos, int pOwner, int pPoints);

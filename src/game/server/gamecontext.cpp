@@ -81,6 +81,10 @@ void CGameContext::Construct(int Resetting)
 
 	if(Resetting==NO_RESET)
 		m_pVoteOptionHeap = new CHeap();
+	
+	
+	m_BlockSecondsIncrease = 0.05;
+	m_BlockSecondsMax = 2.0;
 }
 
 CGameContext::CGameContext(int Resetting)
@@ -2434,6 +2438,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
     dbg_msg("debug","server starting");
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
+	m_BlockMessageDelay = 3 * Server()->TickSpeed();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
     dbg_msg("debug","pServer and pConsole started");
@@ -2547,6 +2552,8 @@ void CGameContext::OnInit(IKernel *pKernel, IMap* pMap, CConfiguration* pConfigF
 	
 	m_pServer = kernel->RequestInterface<IServer>();
 	m_pConsole = kernel->RequestInterface<IConsole>();
+
+	m_BlockMessageDelay = 3 * Server()->TickSpeed();
 
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
