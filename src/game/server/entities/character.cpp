@@ -205,7 +205,7 @@ void CCharacter::HandleFreeze()
 	if(m_Freeze.m_ActivationTick != 0 && m_Freeze.m_ActivationTick != Server()->Tick() && m_ActiveWeapon != WEAPON_NINJA) {
 		//do actual freezing
 		m_ActiveWeapon = WEAPON_NINJA;
-		ResetInput();
+		ResetInput(false);
 	}
 	
 	if(m_ActiveWeapon != WEAPON_NINJA || !IsAlive())
@@ -599,10 +599,13 @@ void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
 	mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
 }
 
-void CCharacter::ResetInput()
+void CCharacter::ResetInput(bool KeepHook)
 {
 	m_Input.m_Direction = 0;
-	m_Input.m_Hook = 0;
+	if(!KeepHook)
+	{
+		m_Input.m_Hook = 0;
+	}
 	// simulate releasing the fire button
 	if((m_Input.m_Fire&1) != 0)
 		m_Input.m_Fire++;
@@ -782,6 +785,12 @@ void CCharacter::Tick()
 	// clamp usableBlockSeconds between 0 and blockSecondsMax
 	m_UsableBlockSeconds = clamp<float>(m_UsableBlockSeconds, 0.0, GameServer()->m_BlockSecondsMax);
 
+	if(m_Core.m_HookState == HOOK_FLYING || m_Core.m_HookState == HOOK_GRABBED)
+	{
+		m_Core.m_HookTick = Server()->Tick();
+		m_ReckoningTick = 0;
+	}
+
     if(m_pPlayer && m_pPlayer->m_EyeEmote >= 0)
     {
         int Until = (m_pPlayer->m_EyeEmoteDuration > 0)
@@ -858,32 +867,39 @@ void CCharacter::TickDefered()
 	}
 
 	// update the m_SendCore if needed
-	{
-		CNetObj_Character Predicted;
-		CNetObj_Character Current;
-		mem_zero(&Predicted, sizeof(Predicted));
-		mem_zero(&Current, sizeof(Current));
-		m_ReckoningCore.Write(&Predicted);
-		m_Core.Write(&Current);
+    {
+        CNetObj_Character Predicted;
+        CNetObj_Character Current;
+        mem_zero(&Predicted, sizeof(Predicted));
+        mem_zero(&Current, sizeof(Current));
+        m_ReckoningCore.Write(&Predicted);
+        m_Core.Write(&Current);
 
-		// only allow dead reackoning for a top of 3 seconds
-		if(m_ReckoningTick+Server()->TickSpeed()*3 < Server()->Tick() || mem_comp(&Predicted, &Current, sizeof(CNetObj_Character)) != 0)
-		{
-			m_ReckoningTick = Server()->Tick();
-			m_SendCore = m_Core;
-			m_ReckoningCore = m_Core;
-		}
-	}
-	
-	m_pPlayer->m_Stats.m_NumJumped += m_Core.m_CoreStats.m_NumJumped;
-	m_pPlayer->m_Stats.m_NumTilesMoved += m_Core.m_CoreStats.m_NumTilesMoved;
-	m_pPlayer->m_Stats.m_NumHooks += m_Core.m_CoreStats.m_NumHooks;
-	if(m_Core.m_CoreStats.m_MaxSpeed > m_pPlayer->m_Stats.m_MaxSpeed) m_pPlayer->m_Stats.m_MaxSpeed = m_Core.m_CoreStats.m_MaxSpeed;
-	m_pPlayer->m_Stats.m_NumTeeCollisions += m_Core.m_CoreStats.m_NumTeeCollisions;
-	mem_zero(&m_Core.m_CoreStats, sizeof(m_Core.m_CoreStats));
-	
-	if(IsFrozen() && m_Freeze.m_ActivationTick != Server()->Tick()) ++m_pPlayer->m_Stats.m_NumFreezeTicks;
-    
+        bool forceSend = false;
+
+        // force send if frozen or hook active
+        if (IsFrozen() || m_Core.m_HookState == HOOK_FLYING || m_Core.m_HookState == HOOK_GRABBED)
+            forceSend = true;
+
+        // send if core differs or 3s passed or forceSend
+        if (m_ReckoningTick + Server()->TickSpeed() * 3 < Server()->Tick() || mem_comp(&Predicted, &Current, sizeof(CNetObj_Character)) != 0 || forceSend)
+        {
+            m_ReckoningTick = Server()->Tick();
+            m_SendCore = m_Core;
+            m_ReckoningCore = m_Core;
+        }
+    }
+
+    m_pPlayer->m_Stats.m_NumJumped += m_Core.m_CoreStats.m_NumJumped;
+    m_pPlayer->m_Stats.m_NumTilesMoved += m_Core.m_CoreStats.m_NumTilesMoved;
+    m_pPlayer->m_Stats.m_NumHooks += m_Core.m_CoreStats.m_NumHooks;
+    if (m_Core.m_CoreStats.m_MaxSpeed > m_pPlayer->m_Stats.m_MaxSpeed)
+        m_pPlayer->m_Stats.m_MaxSpeed = m_Core.m_CoreStats.m_MaxSpeed;
+    m_pPlayer->m_Stats.m_NumTeeCollisions += m_Core.m_CoreStats.m_NumTeeCollisions;
+    mem_zero(&m_Core.m_CoreStats, sizeof(m_Core.m_CoreStats));
+
+    if (IsFrozen() && m_Freeze.m_ActivationTick != Server()->Tick())
+        ++m_pPlayer->m_Stats.m_NumFreezeTicks;
 }
 
 void CCharacter::TickPaused()
@@ -1505,8 +1521,13 @@ void CCharacter::Snap(int SnappingClient)
 	{
 		pCharacter->m_Tick = m_ReckoningTick;
 		m_SendCore.Write(pCharacter);
-	}
-
+		if(m_Core.m_HookState != HOOK_RETRACTED)
+        {
+            pCharacter->m_HookState = m_Core.m_HookState;
+            pCharacter->m_HookTick = Server()->Tick();
+            pCharacter->m_HookedPlayer = m_Core.m_HookedPlayer;
+        }
+    }
 	// set emote
 	if (m_EmoteStop < Server()->Tick())
 	{
