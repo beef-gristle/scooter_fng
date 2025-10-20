@@ -765,8 +765,8 @@ void CGameContext::OnClientConnected(int ClientID, int PreferedTeam)
     
 	// Create player
 	int StartTeam = m_pController->ClampTeam(PreferedTeam);
-	if(PreferedTeam == -2)
-		StartTeam = m_pController->GetAutoTeam(ClientID);
+	// if(PreferedTeam == -2)
+	StartTeam = m_pController->GetAutoTeam(ClientID);
 
 	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, StartTeam);
 	m_pController->CheckTeamBalance();

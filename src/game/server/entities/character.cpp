@@ -1050,37 +1050,7 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
             {
                 CPlayer *pFreezer = GameServer()->m_apPlayers[m_FrozenBy];
                 CPlayer *pKiller = GameServer()->m_apPlayers[pPlayerID];
-
-
-
-				/* Temporary debug messages to help figure out kill trading */
-				CCharacter *pFreChar = pFreezer->GetCharacter();
-				CCharacter *pKilChar = pKiller->GetCharacter();
-
-				char fBuf[MAX_INPUT_SIZE];
-				char kBuf[MAX_INPUT_SIZE];
-
-				str_format(fBuf, sizeof(fBuf), "'%s' stats: steals='%d', roundSteals='%d', stealsFrom(%d)='%d'",
-					Server()->ClientName(m_FrozenBy),
-					pFreezer->m_Steals,
-					pFreezer->m_RoundSteals,
-					pPlayerID,
-					pFreChar->m_StealsFrom[pPlayerID]
-				);
-				str_format(kBuf, sizeof(kBuf), "'%s' stats: steals='%d', roundSteals='%d', stealsFrom(%d)='%d'",
-					Server()->ClientName(pPlayerID),
-					pKiller->m_Steals,
-					pKiller->m_RoundSteals,
-					m_FrozenBy,
-					pKilChar->m_StealsFrom[m_FrozenBy]
-				);
-				GameServer()->SendChat(-1, CHAT_ALL, fBuf);
-				GameServer()->SendChat(-1, CHAT_ALL, kBuf);
-
-				/* ^^^ Kill trading debug messages ^^^ */
-
-
-
+				
                 if(pFreezer && pKiller)
                 {
                     CCharacter *pFreezerChar = pFreezer->GetCharacter();
