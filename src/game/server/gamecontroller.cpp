@@ -694,11 +694,20 @@ int IGameController::GetAutoTeam(int NotThisID)
 	srand(Server()->Tick());
 	int Team = 0;
 	if(IsTeamplay()) {
+		// First check if scores are different
+		if (m_aTeamscore[TEAM_RED] < m_aTeamscore[TEAM_BLUE]) {
+			Team = TEAM_RED;
+		} else if (m_aTeamscore[TEAM_BLUE] < m_aTeamscore[TEAM_RED]) {
+			Team = TEAM_BLUE;
+		} else {
+			// If they're the same, random it is
+			Team = rand() % 2;
+		}
+
+		// If teams are uneven, override the score
+		// check/random and go with the smaller team
 		if(aNumplayers[TEAM_RED] > aNumplayers[TEAM_BLUE]) Team = TEAM_BLUE;
 		else if(aNumplayers[TEAM_BLUE] > aNumplayers[TEAM_RED]) Team = TEAM_RED;
-		// else random team
-		else
-			Team = rand() % 2;
 	}
 
 	if(CanJoinTeam(Team, NotThisID))

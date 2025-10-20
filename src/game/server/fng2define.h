@@ -11,4 +11,11 @@ enum{
 	WEAPON_SPIKE_PURPLE,
 };
 
+constexpr const char *fng_typenames[] = {
+	"fng2++",
+    "solofng2++",
+    "boomfng2++",
+    "soloboomfng2++",
+};
+
 #endif
