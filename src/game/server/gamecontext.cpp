@@ -3513,7 +3513,7 @@ bBuf[totalLen++] = ' ';
 	}
 
 	char aBuf[48];
-	str_format(aBuf, sizeof(aBuf), "sv_gametype %s; reload", targetGametype);
+	str_format(aBuf, sizeof(aBuf), "sv_gametype %s; reload; shuffle_teams;", targetGametype);
 	pSelf->Console()->ExecuteLine(aBuf);
 }
 
