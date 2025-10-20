@@ -388,6 +388,7 @@ public:
     static void CmdUseless(CGameContext* pContext, int pClientID, const char** pArgs, int ArgNum);
     static void ConMute(IConsole::IResult *pResult, void *pUser);
     static void ConUnmute(IConsole::IResult *pResult, void *pUser);
+	static void ConListIDs(IConsole::IResult *pResult, void *pUserData);
     static void CmdPause(CGameContext* pContext, int pClientID, const char** pArgs, int ArgNum);
     static void CmdStatsAll(CGameContext* pContext, int pClientID, const char** pArgs, int ArgNum);
     static void CmdFewSteals(CGameContext* pContext, int pClientID, const char** pArgs, int ArgNum);

@@ -52,7 +52,7 @@ public:
 
 	void OnPredictedInput(CNetObj_PlayerInput *pNewInput);
 	void OnDirectInput(CNetObj_PlayerInput *pNewInput);
-	void ResetInput();
+	void ResetInput(bool KeepHook);
 
 	int GetActiveWeaponForReload();
 	void FireWeapon();

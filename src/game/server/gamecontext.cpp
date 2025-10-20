@@ -2425,6 +2425,7 @@ void CGameContext::OnConsoleInit()
     Console()->Register("toggle_dyncam", "i", CFGFLAG_SERVER, CGameContext::ConToggleDyncam, this, "Enable or disable dynamic camera draw distances");
     Console()->Register("mute", "ii", CFGFLAG_SERVER, ConMute, this, "Mute a player from sending chat messages");
     Console()->Register("unmute", "i", CFGFLAG_SERVER, ConUnmute, this, "Unmute a player by ID");
+	Console()->Register("list", "", CFGFLAG_SERVER, ConListIDs, this, "List Players (IPs Hidden)");
 
 	// Added by Pig-Eye
 	Console()->Register("gamemode", "?s", CFGFLAG_SERVER, ConChangeGamemode, this, "Change the gamemode");
@@ -3466,6 +3467,31 @@ void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData)
     {
         pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "unmute", "player not muted");
     }
+}
+
+void CGameContext::ConListIDs(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pThis = (CGameContext *)pUserData;
+    IServer *pServer = pThis->Server();
+	char aBuf[1024];
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(!pServer->ClientIngame(i))
+            continue;
+
+		const char *pName = pServer->ClientName(i);
+
+		const char *pAuthStr = "";
+		int AuthLevel = pServer->GetAuthed(i);
+		if(AuthLevel == CServer::AUTHED_ADMIN)
+            pAuthStr = " (Admin)";
+        else if(AuthLevel == CServer::AUTHED_MOD)
+            pAuthStr = " (Mod)";
+								
+		str_format(aBuf, sizeof(aBuf), "id=%d name='%s'%s",
+                   i, pName, pAuthStr);
+        pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf);
+	}
 }
 
 void CGameContext::ConChangeGamemode(IConsole::IResult *pResult, void *pUserData)

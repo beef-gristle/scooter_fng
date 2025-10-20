@@ -78,6 +78,7 @@ public:
 	class IGameServer *GameServer() { return m_pGames->m_pGameServer; }
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
+	virtual int GetAuthed(int ClientID) const;
 
 	enum
 	{

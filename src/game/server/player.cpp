@@ -309,13 +309,14 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 
 	if(NewInput->m_PlayerFlags&PLAYERFLAG_CHATTING)
 	{
+		
 		// skip the input if chat is active
 		if(m_PlayerFlags&PLAYERFLAG_CHATTING)
 			return;
 
 		// reset input
 		if(m_pCharacter)
-			m_pCharacter->ResetInput();
+			m_pCharacter->ResetInput(true);
 
 		m_PlayerFlags = NewInput->m_PlayerFlags;
  		return;
