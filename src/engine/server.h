@@ -47,7 +47,7 @@ public:
 		Structure: CClientInfo
 	*/
 
-	virtual int GetAuthed(int ClientID) const;
+	virtual int GetAuthed(int ClientID) const = 0;
 
 	struct CClientInfo
 	{
