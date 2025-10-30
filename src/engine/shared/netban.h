@@ -222,6 +222,33 @@ protected:
 	}
 
 	template<class T>
+	void MakeBanLogInfo(const CBan<T> *pBan, char *pBuf, unsigned BuffSize) const
+	{
+		if(pBan == 0 || pBuf == 0)
+		{
+			if(BuffSize > 0)
+				pBuf[0] = 0;
+			return;
+		}
+
+		char aDate[20];
+		char aIP[NETADDR_MAXSTRSIZE];
+
+		str_timestamp(aDate, sizeof(aDate));
+		NetToString(&pBan->m_Data, aIP, sizeof(aIP));
+
+		int mins = ((pBan->m_Info.m_Expires - time_timestamp()) + 59) / 60;
+
+		// TODO: find player name and include that in the log
+		// For now, just use a placeholder name
+		char aName[16];
+		str_format(aName, sizeof(aName), "<no name>");
+		str_format(pBuf, BuffSize, "%s|%s|%d|%s|%s", aDate, aIP, mins, pBan->m_Info.m_aReason, aName);
+	}
+
+	void AppendToBanLog(const char *filename, const char *pBuf, unsigned BuffSize, bool overwrite = true);
+
+	template<class T>
 	int Ban(T *pBanPool, const typename T::CDataType *pData, int Seconds,
 		const char *pReason);
 	template<class T>

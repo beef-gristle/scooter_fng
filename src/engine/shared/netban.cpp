@@ -235,6 +235,45 @@ typename CNetBan::CBan<T> *CNetBan::CBanPool<T, HashCount>::Get(int Index) const
 	return 0;
 }
 
+void CNetBan::AppendToBanLog(const char *filename, const char *pBuf, unsigned BuffSize, bool overwrite) {
+	// TODO: scan each line first to see if an ip is already listed
+	// If so (and overwrite == true), remove that line so
+	//   that there isn't a duplicate
+
+	// Copy the contents of the file into a buffer
+	IOHANDLE banFile = Storage()->OpenFile(filename, IOFLAG_READ, IStorage::TYPE_ALL);
+	if (!banFile) {
+		// If file doesn't exist, REALLY make sure it doesn't exist
+		// file caching seems to do weird stuff without this line
+		//
+		// If the file can't be opened for some other reason,
+		// this is probably more harmful than good
+		fs_remove(filename);
+
+		banFile = Storage()->OpenFile(filename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+		io_close(banFile);
+
+		banFile = Storage()->OpenFile(filename, IOFLAG_READ, IStorage::TYPE_ALL);
+	}
+	long fileLength = io_length(banFile);
+	char *contents = new char[fileLength];
+	io_seek(banFile, 0, IOSEEK_START);
+	io_read(banFile, contents, fileLength);
+	io_flush(banFile);
+	io_close(banFile);
+
+	// Then reopen it and write everything - the buffer
+	// of the original file + the new line (w/ a newline)
+	banFile = Storage()->OpenFile(filename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	io_seek(banFile, 0, IOSEEK_START);
+	io_write(banFile, contents, fileLength);
+	io_write(banFile, pBuf, BuffSize);
+	io_write_newline(banFile);
+	io_flush(banFile);
+	io_close(banFile);
+	delete contents;
+}
+
 template<class T>
 int CNetBan::Ban(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason)
 {
@@ -272,6 +311,20 @@ int CNetBan::Ban(T *pBanPool, const typename T::CDataType *pData, int Seconds, c
 		char aBuf[128];
 		MakeBanInfo(pBan, aBuf, sizeof(aBuf), MSGTYPE_BANADD);
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", aBuf);
+
+		// Create the entry string that goes in the ban log file
+		char logBuf[128];
+		MakeBanLogInfo(pBan, logBuf, sizeof(logBuf));
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", logBuf);
+
+		char aFilename[256];
+		// If need be, make multiple files
+		// with dynamically-created names
+		str_format(aFilename, sizeof(aFilename), "banlog.txt");
+
+		// Add the log to the ban log file
+		AppendToBanLog(aFilename, logBuf, str_length(logBuf));
+
 		return 0;
 	}
 	else
@@ -290,6 +343,9 @@ int CNetBan::Unban(T *pBanPool, const typename T::CDataType *pData)
 		MakeBanInfo(pBan, aBuf, sizeof(aBuf), MSGTYPE_BANREM);
 		pBanPool->Remove(pBan);
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", aBuf);
+
+		// TODO: Remove from the ban log file (assuming it's there)
+
 		return 0;
 	}
 	else
