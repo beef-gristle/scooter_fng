@@ -38,6 +38,8 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	vec2 m_LastViewPos;
     vec2 m_ViewVel;
 
+	m_MaxViewDist = 0;
+
 	memset(m_SnappingClients, -1, sizeof(m_SnappingClients));
 	m_SnappingClients[0].id = ClientID;
 	m_SnappingClients[0].distance = 0;
@@ -138,6 +140,12 @@ void CPlayer::Tick()
 			if(m_pCharacter->IsAlive())
 			{
 				m_ViewPos = m_pCharacter->m_Pos;
+
+				auto inp = GetCharacter()->GetLatestInput();
+				int x = inp.m_TargetX;
+				int y = inp.m_TargetY;
+				int viewDist = sqrt(x * x + y * y);
+				m_MaxViewDist = max<int>(m_MaxViewDist, viewDist);
 			}
 			else
 			{

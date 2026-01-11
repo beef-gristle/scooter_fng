@@ -2496,6 +2496,8 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
     AddServerCommand("emoteeyes", "Change your eye emote", "<normal|happy|pain|surprise|angry|blink> [duration]", CmdEmoteEyes);
     AddServerCommand("emote", "Change your eye emote", "<normal|happy|pain|surprise|angry|blink> [duration]", CmdEmoteEyes);
     AddServerCommand("earrape", "funny little command", "", CmdEarrape);
+
+	AddServerCommand("mdump", "see players' max view distance", "", CmdMdump);
     
 	// ... rest of AddServerCommand calls ...
 
@@ -3503,7 +3505,6 @@ void CGameContext::ConChangeGamemode(IConsole::IResult *pResult, void *pUserData
 	CGameContext *pSelf = (CGameContext *)pUserData;
 
 	const char *currentGametype = pSelf->GameType();
-	const char *targetGametype = pResult->GetString(0);
 
 	if (pResult->NumArguments() == 0) {
 		char aBuf[64];
@@ -3527,6 +3528,8 @@ bBuf[totalLen++] = ' ';
 
 		return;
 	}
+
+	const char *targetGametype = pResult->GetString(0);
 
 	if (str_comp(currentGametype, targetGametype) == 0) {
 		char aBuf[64];
@@ -6826,6 +6829,22 @@ void CGameContext::CmdEarrape(CGameContext* pContext, int ClientID, const char**
 	pContext->CreateSound(Pos, SOUND_MENU, CmaskAll());
 	pContext->CreateSound(Pos, SOUND_MENU, CmaskAll());
 	pContext->CreateSound(Pos, SOUND_MENU, CmaskAll());
+}
+
+void CGameContext::CmdMdump(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum)
+{
+	char bufs[MAX_CLIENTS][64];
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer* pPlayer = pContext->m_apPlayers[i];
+		if (!pPlayer)
+		{
+			continue;
+		}
+
+		str_format(bufs[i], sizeof(bufs[i]), "%s: %d", pPlayer->m_aSavedName, pPlayer->m_MaxViewDist);
+		pContext->SendChat(-1, CGameContext::CHAT_ALL, bufs[i]);
+	}
 }
 
 IGameServer *CreateGameServer() { return new CGameContext; }

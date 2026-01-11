@@ -125,6 +125,9 @@ public:
     vec2 m_ViewVel;       // view velocity, updated every tick
     vec2 m_LastViewPos;   // last tick's view pos
 
+	// used for mdump
+	int m_MaxViewDist;
+
 	// states if the client is chatting, accessing a menu etc.
 	int m_PlayerFlags;
 
