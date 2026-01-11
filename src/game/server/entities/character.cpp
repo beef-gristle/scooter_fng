@@ -751,7 +751,7 @@ void CCharacter::Tick()
 						if ((Server()->Tick() - m_LastBlockMessage) > GameServer()->m_BlockMessageDelay) {
 							char aBuf[17 + MAX_NAME_LENGTH];
 							str_format(aBuf, sizeof(aBuf), "'%s' STOP BLOCKING!", Server()->ClientName(m_pPlayer->GetCID()));
-							GameServer()->SendChat(-1, CHAT_ALL, aBuf);
+							GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 							m_LastBlockMessage = Server()->Tick();
 							
 						}
