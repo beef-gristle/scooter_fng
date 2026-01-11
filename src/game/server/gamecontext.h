@@ -419,11 +419,13 @@ public:
     static void CmdTopStats(CGameContext *pContext, int ClientID, const char **pArgs, int ArgNum);
     static void CmdEmoteEyes(CGameContext *pContext, int ClientID, const char **pArgs, int ArgNum);
     void SetEyeEmoteDefault(int ClientID);
+	static void ConResetEarrape(IConsole::IResult *pResult, void *pUserData);
+	static void ConEarrapeCooldownSeconds(IConsole::IResult *pResult, void *pUserData);
     static void CmdEarrape(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum);
 
     
     int64_t m_LastEarrapeTick;
-    
+    int64_t m_EarrapeCooldownSeconds;
 };
 
 inline QuadroMask CmaskAll() { return QuadroMask(-1); }

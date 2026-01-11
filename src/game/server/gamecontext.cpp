@@ -85,13 +85,15 @@ void CGameContext::Construct(int Resetting)
 	
 	m_BlockSecondsIncrease = 0.05;
 	m_BlockSecondsMax = 2.0;
+
+	m_LastEarrapeTick = -1;
+	m_EarrapeCooldownSeconds = 30 * 60; // 30 minutes by default
 }
 
 CGameContext::CGameContext(int Resetting)
 {
 	m_Config = &g_Config;
 	Construct(Resetting);
-    m_LastEarrapeTick = -Server()->Tick();
 }
 
 CGameContext::CGameContext(int Resetting, CConfiguration* pConfig)
@@ -2430,6 +2432,8 @@ void CGameContext::OnConsoleInit()
 	// Added by Pig-Eye
 	Console()->Register("gamemode", "?s", CFGFLAG_SERVER, ConChangeGamemode, this, "Change the gamemode");
 	Console()->Register("makesay", "ir", CFGFLAG_SERVER, ConMakeSay, this, "Force an unassuming player to say something probably bad");
+	Console()->Register("reset_earrape", "", CFGFLAG_SERVER, ConResetEarrape, this, "Reset the cooldown of earrape");
+	Console()->Register("earrape_cooldown", "?i", CFGFLAG_SERVER, ConEarrapeCooldownSeconds, this, "Change the cooldown of earrape, in seconds");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
@@ -6752,6 +6756,29 @@ void CGameContext::CmdTopStats(CGameContext *pContext, int pClientID, const char
 	}
 }
 
+void CGameContext::ConResetEarrape(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pSelf->m_LastEarrapeTick = -1;
+}
+
+void CGameContext::ConEarrapeCooldownSeconds(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	if (pResult->NumArguments() == 0)
+	{
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "Current earrape cooldown: %d seconds", pSelf->m_EarrapeCooldownSeconds);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "earrape", aBuf);
+		return;
+	}
+
+	int seconds = pResult->GetInteger(0);
+
+	pSelf->m_EarrapeCooldownSeconds = seconds;
+}
+
 void CGameContext::CmdEarrape(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum)
 {
 	CPlayer* pPlayer = pContext->m_apPlayers[ClientID];
@@ -6759,13 +6786,20 @@ void CGameContext::CmdEarrape(CGameContext* pContext, int ClientID, const char**
 		return;
 
 	int64_t Now = pContext->Server()->Tick();
-	int64_t CooldownTicks = 30 * 60 * pContext->Server()->TickSpeed(); // 30 minutes
+	int64_t CooldownTicks = pContext->m_EarrapeCooldownSeconds * pContext->Server()->TickSpeed();
 
-	if(Now < pContext->m_LastEarrapeTick + CooldownTicks)
+	if(Now < pContext->m_LastEarrapeTick + CooldownTicks && pContext->m_LastEarrapeTick != -1)
 	{
 		int SecondsLeft = (pContext->m_LastEarrapeTick + CooldownTicks - Now) / pContext->Server()->TickSpeed();
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "Earrape cooldown: %d minute%s left", SecondsLeft / 60, (SecondsLeft / 60 == 1 ? "" : "s"));
+		if (SecondsLeft > 60)
+		{
+			str_format(aBuf, sizeof(aBuf), "Earrape cooldown: %d minute%s left", SecondsLeft / 60, (SecondsLeft / 60 == 1 ? "" : "s"));
+		}
+		else
+		{
+			str_format(aBuf, sizeof(aBuf), "Earrape cooldown: %d second%s left", SecondsLeft, (SecondsLeft == 1 ? "" : "s"));
+		}
 		pContext->SendChatTarget(ClientID, aBuf);
 		return;
 	}
