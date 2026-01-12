@@ -423,6 +423,7 @@ public:
 	static void ConEarrapeCooldownSeconds(IConsole::IResult *pResult, void *pUserData);
     static void CmdEarrape(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum);
 	static void CmdMdump(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum);
+	static void ConGitInfo(IConsole::IResult *pResult, void *pUserData);
 
     
     int64_t m_LastEarrapeTick;

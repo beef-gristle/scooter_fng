@@ -2434,6 +2434,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("makesay", "ir", CFGFLAG_SERVER, ConMakeSay, this, "Force an unassuming player to say something probably bad");
 	Console()->Register("reset_earrape", "", CFGFLAG_SERVER, ConResetEarrape, this, "Reset the cooldown of earrape");
 	Console()->Register("earrape_cooldown", "?i", CFGFLAG_SERVER, ConEarrapeCooldownSeconds, this, "Change the cooldown of earrape, in seconds");
+	Console()->Register("git_info", "", CFGFLAG_SERVER, ConGitInfo, this, "Display some helpful git info");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
@@ -6844,6 +6845,29 @@ void CGameContext::CmdMdump(CGameContext* pContext, int ClientID, const char** p
 
 		str_format(bufs[i], sizeof(bufs[i]), "%s: %d", pPlayer->m_aSavedName, pPlayer->m_MaxViewDist);
 		pContext->SendChat(-1, CGameContext::CHAT_ALL, bufs[i]);
+	}
+}
+
+// CMake should automatically create these macros,
+// if not they get some beautiful placeholders
+#ifndef GIT_COMMIT
+#define GIT_COMMIT "<missing>"
+#endif
+#ifndef GIT_BRANCH
+#define GIT_BRANCH "<missing>"
+#endif
+void CGameContext::ConGitInfo(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Git Commit: %s", GIT_COMMIT);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "git info", aBuf);
+	}
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Git Branch: %s", GIT_BRANCH);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "git info", aBuf);
 	}
 }
 

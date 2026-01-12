@@ -752,6 +752,25 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   list(APPEND TARGETS_LINK ${TARGET_SERVER_LAUNCHER})
 endif()
 
+# Allow the binary to include git information
+execute_process(
+  COMMAND git rev-parse HEAD
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_COMMIT
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(
+  COMMAND git rev-parse --abbrev-ref HEAD
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_BRANCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+target_compile_definitions(fng2_srv PRIVATE
+GIT_COMMIT="${GIT_COMMIT}"
+GIT_BRANCH="${GIT_BRANCH}"
+)
+
+
 ########################################################################
 # VARIOUS TARGETS
 ########################################################################
