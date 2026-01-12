@@ -95,10 +95,10 @@ void CPickup::Tick()
 					for(; pC; pC = (CCharacter *)pC->TypeNext())
 					{
 						if (pC != pChr)
-							pC->SetEmote(EMOTE_SURPRISE, Server()->Tick() + Server()->TickSpeed());
+							pC->SetEmote(EMOTE_SURPRISE, Server()->TickSpeed());
 					}
 
-					pChr->SetEmote(EMOTE_ANGRY, Server()->Tick() + 1200 * Server()->TickSpeed() / 1000);
+					pChr->SetEmote(EMOTE_ANGRY, 1200 * Server()->TickSpeed() / 1000);
 					break;
 				}
 

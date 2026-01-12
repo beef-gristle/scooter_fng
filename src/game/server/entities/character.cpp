@@ -546,10 +546,12 @@ void CCharacter::Unfreeze(int pPlayerID) {
 		GameServer()->SendTuningParams(m_pPlayer->GetCID());
 }
 
-void CCharacter::SetEmote(int Emote, int Tick)
+void CCharacter::SetEmote(int Emote, int Duration)
 {
+	GetPlayer()->m_EyeEmote = Emote;
+	GetPlayer()->m_EyeEmoteDuration = Duration;
 	m_EmoteType = Emote;
-	m_EmoteStop = Tick;
+	m_EmoteStop = Server()->Tick() + Duration;
 }
 
 void CCharacter::SetKiller(int pKillerID, unsigned int pHookTicks) {
@@ -781,15 +783,6 @@ void CCharacter::Tick()
 
 	// clamp usableBlockSeconds between 0 and blockSecondsMax
 	m_UsableBlockSeconds = clamp<float>(m_UsableBlockSeconds, 0.0, GameServer()->m_BlockSecondsMax);
-
-    if(m_pPlayer && m_pPlayer->m_EyeEmote >= 0)
-    {
-        int Until = (m_pPlayer->m_EyeEmoteDuration > 0)
-            ? (GameServer()->Server()->Tick() + m_pPlayer->m_EyeEmoteDuration)
-            : -1;
-        SetEmote(m_pPlayer->m_EyeEmote, Until);
-    }
-	return;
 }
 
 void CCharacter::TickDefered()
@@ -1215,7 +1208,7 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 				CCharacter* pKiller = ((CPlayer*)GameServer()->m_apPlayers[pPlayerID])->GetCharacter();
 				if (pKiller)
 				{
-					pKiller->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
+					pKiller->SetEmote(EMOTE_HAPPY, Server()->TickSpeed());
 				}
 
 				if (GameServer()->m_pController->IsTeamplay()) {
@@ -1379,12 +1372,11 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			if (From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From]) {
 				CCharacter *pChr = pPlayer->GetCharacter();
 				if (pChr)
-					pChr->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
+					pChr->SetEmote(EMOTE_HAPPY, Server()->TickSpeed());
 			}
 
 			GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
-			m_EmoteType = EMOTE_PAIN;
-			m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+			SetEmote(EMOTE_PAIN, 500 * Server()->TickSpeed() / 1000);
 		}
 	}
 	return true;

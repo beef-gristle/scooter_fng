@@ -1332,8 +1332,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 			if(pPlayer)
             {
-                pPlayer->m_EyeEmote = eicon;
-                pPlayer->m_EyeEmoteDuration = Server()->TickSpeed() * 2.0f; // 2 seconds
+				pPlayer->GetCharacter()->SetEmote(eicon, Server()->TickSpeed() * 2.0f);
             }
 		}
 		else if (MsgID == NETMSGTYPE_CL_KILL && !m_World.m_Paused)
@@ -1911,27 +1910,38 @@ void CGameContext::CmdEmote(CGameContext* pContext, int pClientID, const char** 
 	CPlayer* pPlayer = pContext->m_apPlayers[pClientID];
 	
 	if (ArgNum > 0) {
+		int Emote = EMOTE_NORMAL;
 		if (!str_comp_nocase_whitespace(pArgs[0], "angry"))
-				pPlayer->m_Emotion = EMOTE_ANGRY;
+				Emote = EMOTE_ANGRY;
 		else if (!str_comp_nocase_whitespace(pArgs[0], "blink"))
-			pPlayer->m_Emotion = EMOTE_BLINK;
+			Emote = EMOTE_BLINK;
 		else if (!str_comp_nocase_whitespace(pArgs[0], "close"))
-			pPlayer->m_Emotion = EMOTE_BLINK;
+			Emote = EMOTE_BLINK;
 		else if (!str_comp_nocase_whitespace(pArgs[0], "happy"))
-			pPlayer->m_Emotion = EMOTE_HAPPY;
+			Emote = EMOTE_HAPPY;
 		else if (!str_comp_nocase_whitespace(pArgs[0], "pain"))
-			pPlayer->m_Emotion = EMOTE_PAIN;
+			Emote = EMOTE_PAIN;
 		else if (!str_comp_nocase_whitespace(pArgs[0], "surprise"))
-			pPlayer->m_Emotion = EMOTE_SURPRISE;
+			Emote = EMOTE_SURPRISE;
 		else if (!str_comp_nocase_whitespace(pArgs[0], "normal"))
-			pPlayer->m_Emotion = EMOTE_NORMAL;
+			Emote = EMOTE_NORMAL;
 		else
+		{
 			pContext->SendChatTarget(pClientID, "Unknown emote... Say /emote");
+			return;
+		}
 		
-		int Duration = pContext->Server()->TickSpeed();
+		int Duration = 1;
 		if(ArgNum > 1) Duration = str_toint(pArgs[1]);
+		Duration *= pContext->Server()->TickSpeed();
 		
-		pPlayer->m_EmotionDuration = Duration * pContext->Server()->TickSpeed();
+		pPlayer->m_Emotion = Emote;
+		pPlayer->m_EmotionDuration = Duration;
+
+		if (pPlayer->GetCharacter())
+		{
+			pPlayer->GetCharacter()->SetEmote(Emote, Duration);
+		}
 	} else {
 		//ddrace like
 		pContext->SendChatTarget(pClientID, "Emote commands are: /emote surprise /emote blink /emote close /emote angry /emote happy /emote pain");
@@ -1954,17 +1964,17 @@ void CGameContext::CmdEmoteEyes(CGameContext* pContext, int pClientID, const cha
 
 	int Emote = EMOTE_NORMAL;
 
-	if(!str_comp_nocase(pArgs[0], "angry") || !str_comp_nocase(pArgs[0], "angry 999999"))
+	if(!str_comp_nocase_whitespace(pArgs[0], "angry"))
 		Emote = EMOTE_ANGRY;
-	else if(!str_comp_nocase(pArgs[0], "blink") || !str_comp_nocase(pArgs[0], "blink 999999"))
+	else if(!str_comp_nocase_whitespace(pArgs[0], "blink"))
 		Emote = EMOTE_BLINK;
-	else if(!str_comp_nocase(pArgs[0], "happy") || !str_comp_nocase(pArgs[0], "happy 999999"))
+	else if(!str_comp_nocase_whitespace(pArgs[0], "happy"))
 		Emote = EMOTE_HAPPY;
-	else if(!str_comp_nocase(pArgs[0], "pain") || !str_comp_nocase(pArgs[0], "pain 999999"))
+	else if(!str_comp_nocase_whitespace(pArgs[0], "pain"))
 		Emote = EMOTE_PAIN;
-	else if(!str_comp_nocase(pArgs[0], "surprise") || !str_comp_nocase(pArgs[0], "surprise 999999"))
+	else if(!str_comp_nocase_whitespace(pArgs[0], "surprise"))
 		Emote = EMOTE_SURPRISE;
-	else if(!str_comp_nocase(pArgs[0], "normal") || !str_comp_nocase(pArgs[0], "normal 999999"))
+	else if(!str_comp_nocase_whitespace(pArgs[0], "normal"))
 		Emote = EMOTE_NORMAL;
 	else
 	{
@@ -1975,20 +1985,8 @@ void CGameContext::CmdEmoteEyes(CGameContext* pContext, int pClientID, const cha
 	// Default to -1 (permanent)
 	int Duration = -1;
 
-	if(ArgNum >= 2)
-	{
-		int Seconds = clamp(str_toint(pArgs[1]), 1, 999999);
-		Duration = Seconds * pContext->Server()->TickSpeed();
-
-		if(Seconds >= 999999)
-		{
-			pPlayer->m_DefaultEyeEmote = Emote;
-		}
-	}
-	else
-	{
-		pPlayer->m_DefaultEyeEmote = Emote;
-	}
+	if(ArgNum > 1) Duration = str_toint(pArgs[1]) * pContext->Server()->TickSpeed();
+	else pPlayer->m_DefaultEyeEmote = Emote;
 
 	// Apply eye emote
 	pPlayer->m_EyeEmote = Emote;
@@ -1996,8 +1994,7 @@ void CGameContext::CmdEmoteEyes(CGameContext* pContext, int pClientID, const cha
 
 	if(pPlayer->GetCharacter())
 	{
-		int Until = (Duration > 0) ? (pContext->Server()->Tick() + Duration) : -1;
-		pPlayer->GetCharacter()->SetEmote(Emote, Until);
+		pPlayer->GetCharacter()->SetEmote(Emote, Duration);
 	}
 }
 
@@ -2495,7 +2492,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
     AddServerCommand("topkda", "Top 20 players with highest K/D", "", CmdTopKDAll);
     AddServerCommand("topstats", "Top 1 players for each stat", "", CmdTopStats);
     AddServerCommand("emoteeyes", "Change your eye emote", "<normal|happy|pain|surprise|angry|blink> [duration]", CmdEmoteEyes);
-    AddServerCommand("emote", "Change your eye emote", "<normal|happy|pain|surprise|angry|blink> [duration]", CmdEmoteEyes);
+    AddServerCommand("emote", "Do an emote", "<normal|happy|pain|surprise|angry|blink> [duration]", CmdEmote);
     AddServerCommand("earrape", "funny little command", "", CmdEarrape);
 
 	AddServerCommand("mdump", "See players' max view distance", "", CmdMdump);
