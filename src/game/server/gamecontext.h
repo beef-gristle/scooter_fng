@@ -424,6 +424,7 @@ public:
     static void CmdEarrape(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum);
 	static void CmdMdump(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum);
 	static void ConGitInfo(IConsole::IResult *pResult, void *pUserData);
+	static void CmdSprees(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum);
 
     
     int64_t m_LastEarrapeTick;

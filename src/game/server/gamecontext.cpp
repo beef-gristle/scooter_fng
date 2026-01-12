@@ -2498,7 +2498,8 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
     AddServerCommand("emote", "Change your eye emote", "<normal|happy|pain|surprise|angry|blink> [duration]", CmdEmoteEyes);
     AddServerCommand("earrape", "funny little command", "", CmdEarrape);
 
-	AddServerCommand("mdump", "see players' max view distance", "", CmdMdump);
+	AddServerCommand("mdump", "See players' max view distance", "", CmdMdump);
+	AddServerCommand("sprees", "See players' sprees", "", CmdSprees);
     
 	// ... rest of AddServerCommand calls ...
 
@@ -6834,6 +6835,9 @@ void CGameContext::CmdEarrape(CGameContext* pContext, int ClientID, const char**
 
 void CGameContext::CmdMdump(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum)
 {
+	const char aBuf[] = "=== Bad Mdump ===";
+	pContext->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+
 	char bufs[MAX_CLIENTS][64];
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -6843,7 +6847,7 @@ void CGameContext::CmdMdump(CGameContext* pContext, int ClientID, const char** p
 			continue;
 		}
 
-		str_format(bufs[i], sizeof(bufs[i]), "%s: %d", pPlayer->m_aSavedName, pPlayer->m_MaxViewDist);
+		str_format(bufs[i], sizeof(bufs[i]), "   %s: %d", pPlayer->m_aSavedName, pPlayer->m_MaxViewDist);
 		pContext->SendChat(-1, CGameContext::CHAT_ALL, bufs[i]);
 	}
 }
@@ -6868,6 +6872,25 @@ void CGameContext::ConGitInfo(IConsole::IResult *pResult, void *pUserData)
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "Git Branch: %s", GIT_BRANCH);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "git info", aBuf);
+	}
+}
+
+void CGameContext::CmdSprees(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum)
+{
+	const char aBuf[] = "=== Player Sprees ===";
+	pContext->SendChatTarget(ClientID, aBuf);
+
+	char bufs[MAX_CLIENTS][64];
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer* pPlayer = pContext->m_apPlayers[i];
+		if (!pPlayer || pPlayer->GetTeam() == -1)
+		{
+			continue;
+		}
+
+		str_format(bufs[i], sizeof(bufs[i]), "   %s: %d", pPlayer->m_aSavedName, pPlayer->m_CurrentSpree);
+		pContext->SendChatTarget(ClientID, bufs[i]);
 	}
 }
 

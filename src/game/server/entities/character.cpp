@@ -1228,16 +1228,19 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 			}
         
 			// SPREE END MESSAGE
-			if(m_pPlayer && m_pPlayer->m_CurrentSpree >= 5 && pPlayerID != m_pPlayer->GetCID())
+			if (m_pPlayer && pPlayerID != m_pPlayer->GetCID())
 			{
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "'%s' spree of %d kills ended by '%s'!",
-					Server()->ClientName(m_pPlayer->GetCID()),
-					m_pPlayer->m_CurrentSpree,
-					Server()->ClientName(pPlayerID));
-				GameServer()->SendChat(-1, CHAT_ALL, aBuf);
-				if(m_pPlayer)
-					m_pPlayer->m_CurrentSpree = 0;
+				if (m_pPlayer->m_CurrentSpree >= 5)
+				{
+					char aBuf[128];
+					str_format(aBuf, sizeof(aBuf), "'%s' spree of %d kills ended by '%s'!",
+						Server()->ClientName(m_pPlayer->GetCID()),
+						m_pPlayer->m_CurrentSpree,
+						Server()->ClientName(pPlayerID)
+					);
+					GameServer()->SendChat(-1, CHAT_ALL, aBuf);
+				}
+				m_pPlayer->m_CurrentSpree = 0;
 			}
 		}
 		//if not frozen or selfkill
