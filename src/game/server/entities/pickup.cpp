@@ -94,11 +94,13 @@ void CPickup::Tick()
 					CCharacter *pC = static_cast<CCharacter *>(GameServer()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
 					for(; pC; pC = (CCharacter *)pC->TypeNext())
 					{
-						if (pC != pChr)
+						if (pC && pC != pChr)
 							pC->SetEmote(EMOTE_SURPRISE, Server()->TickSpeed());
 					}
 
-					pChr->SetEmote(EMOTE_ANGRY, 1200 * Server()->TickSpeed() / 1000);
+					if (pChr) {
+						pChr->SetEmote(EMOTE_ANGRY, 1200 * Server()->TickSpeed() / 1000);
+					}
 					break;
 				}
 

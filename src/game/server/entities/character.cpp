@@ -548,8 +548,11 @@ void CCharacter::Unfreeze(int pPlayerID) {
 
 void CCharacter::SetEmote(int Emote, int Duration)
 {
-	GetPlayer()->m_EyeEmote = Emote;
-	GetPlayer()->m_EyeEmoteDuration = Duration;
+	CPlayer *pPlayer = GetPlayer();
+	if (pPlayer) {
+		GetPlayer()->m_EyeEmote = Emote;
+		GetPlayer()->m_EyeEmoteDuration = Duration;
+	}
 	m_EmoteType = Emote;
 	m_EmoteStop = Server()->Tick() + Duration;
 }
@@ -1206,8 +1209,7 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 			else {
 				//set attacker's face to happy (taunt!)
 				CCharacter* pKiller = ((CPlayer*)GameServer()->m_apPlayers[pPlayerID])->GetCharacter();
-				if (pKiller)
-				{
+				if (pKiller) {
 					pKiller->SetEmote(EMOTE_HAPPY, Server()->TickSpeed());
 				}
 

@@ -1332,7 +1332,10 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 			if(pPlayer)
             {
-				pPlayer->GetCharacter()->SetEmote(eicon, Server()->TickSpeed() * 2.0f);
+				CCharacter *pChr = pPlayer->GetCharacter();
+				if (pChr) {
+					pChr->SetEmote(eicon, Server()->TickSpeed() * 2.0f);
+				}
             }
 		}
 		else if (MsgID == NETMSGTYPE_CL_KILL && !m_World.m_Paused)
@@ -1938,9 +1941,9 @@ void CGameContext::CmdEmote(CGameContext* pContext, int pClientID, const char** 
 		pPlayer->m_Emotion = Emote;
 		pPlayer->m_EmotionDuration = Duration;
 
-		if (pPlayer->GetCharacter())
-		{
-			pPlayer->GetCharacter()->SetEmote(Emote, Duration);
+		CCharacter *pChr = pPlayer->GetCharacter();
+		if (pChr) {
+			pChr->SetEmote(Emote, Duration);
 		}
 	} else {
 		//ddrace like
@@ -1992,9 +1995,9 @@ void CGameContext::CmdEmoteEyes(CGameContext* pContext, int pClientID, const cha
 	pPlayer->m_EyeEmote = Emote;
 	pPlayer->m_EyeEmoteDuration = Duration;
 
-	if(pPlayer->GetCharacter())
-	{
-		pPlayer->GetCharacter()->SetEmote(Emote, Duration);
+	CCharacter *pChr = pPlayer->GetCharacter();
+	if (pChr) {
+		pChr->SetEmote(Emote, Duration);
 	}
 }
 
