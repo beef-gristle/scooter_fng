@@ -6848,7 +6848,7 @@ void CGameContext::CmdMdump(CGameContext* pContext, int ClientID, const char** p
 		}
 
 		str_format(bufs[i], sizeof(bufs[i]), "   %s: %d", pPlayer->m_aSavedName, pPlayer->m_MaxViewDist);
-		pContext->SendChat(-1, CGameContext::CHAT_ALL, bufs[i]);
+		pContext->SendChatTarget(ClientID, bufs[i]);
 	}
 }
 
