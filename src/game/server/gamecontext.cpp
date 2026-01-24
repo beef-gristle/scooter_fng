@@ -6836,7 +6836,7 @@ void CGameContext::CmdEarrape(CGameContext* pContext, int ClientID, const char**
 void CGameContext::CmdMdump(CGameContext* pContext, int ClientID, const char** pArgs, int ArgNum)
 {
 	const char aBuf[] = "=== Bad Mdump ===";
-	pContext->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+	pContext->SendChatTarget(ClientID, aBuf);
 
 	char bufs[MAX_CLIENTS][64];
 	for (int i = 0; i < MAX_CLIENTS; i++)
