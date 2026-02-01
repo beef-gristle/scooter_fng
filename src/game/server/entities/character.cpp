@@ -224,7 +224,7 @@ void CCharacter::HandleFreeze()
 	{
 		Unfreeze(-1);
 
-		m_InvincibleTick = Server()->TickSpeed()*0.5;
+		// m_InvincibleTick = Server()->TickSpeed()*0.5; // we don't want that shit after being frozen, maybe make a sv option for it later on
 		return;
 	}
 
