@@ -1325,7 +1325,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 	CPlayer *pPlayer = GameServer()->m_apPlayers[From];
 
-	if ((Weapon == WEAPON_RIFLE || Weapon == WEAPON_GRENADE) && !IsFrozen()) {
+	if ((Weapon == WEAPON_RIFLE || Weapon == WEAPON_GRENADE || (GameServer()->m_Config->m_SvHammerFreeze && Weapon == WEAPON_HAMMER)) && !IsFrozen()) {
 		if ((GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage) || From == m_pPlayer->GetCID()) {
 			// Self-hit or friendly fire with teamdamage off
 			if (From == m_pPlayer->GetCID()) {
@@ -1341,7 +1341,8 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			return false;
 
 		if (m_InvincibleTick == 0) {
-			Freeze(g_Config.m_SvHitFreeze);
+			int freezeTime = (Weapon == WEAPON_HAMMER) ? GameServer()->m_Config->m_SvHammerFreezeTime : g_Config.m_SvHitFreeze;
+			Freeze(freezeTime);
 			Hit(From, Weapon);
 
 			// Set who froze me
@@ -1440,10 +1441,7 @@ void CCharacter::TakeHammerHit(CCharacter* pFrom)
 		m_Killer.m_uiKillerHookTicks = 0;
 		m_Killer.m_KillerID = pPlayer->GetCID();
 
-		if (GameServer()->m_Config->m_SvHammerFreeze && !IsFrozen())
-		{
-			Freeze(GameServer()->m_Config->m_SvHammerFreezeTime);
-		}
+		TakeDamage(vec2(0.0, 0.0), 0, pPlayer->GetCID(), WEAPON_HAMMER);
 	}
 }
 
