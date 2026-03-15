@@ -1439,6 +1439,11 @@ void CCharacter::TakeHammerHit(CCharacter* pFrom)
 	{
 		m_Killer.m_uiKillerHookTicks = 0;
 		m_Killer.m_KillerID = pPlayer->GetCID();
+
+		if (GameServer()->m_Config->m_SvHammerFreeze && !IsFrozen())
+		{
+			Freeze(GameServer()->m_Config->m_SvHammerFreezeTime);
+		}
 	}
 }
 

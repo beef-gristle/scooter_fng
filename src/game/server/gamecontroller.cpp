@@ -608,7 +608,7 @@ void IGameController::Tick()
 		#endif
 			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS && !Server()->IsAuthed(i))
 			{
-				if(Server()->Tick() > GameServer()->m_apPlayers[i]->m_LastActionTick+m_Config.m_SvInactiveKickTime*Server()->TickSpeed()*60)
+				if(Server()->Tick() > GameServer()->m_apPlayers[i]->m_LastActionTick + m_Config.m_SvInactiveKickTime*Server()->TickSpeed())
 				{
 					switch(m_Config.m_SvInactiveKick)
 					{

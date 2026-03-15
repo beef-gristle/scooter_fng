@@ -72,13 +72,16 @@ MACRO_CONFIG_INT(SvSpamprotection, sv_spamprotection, 1, 0, 1, CFGFLAG_SERVER, "
 // Added or modified by Pig-Eye
 MACRO_CONFIG_STR(SvGametype, sv_gametype, 32, "fng2", CFGFLAG_SERVER, "Game type (fng2, fng2solo, fng2boom, fng2boomsolo)")
 MACRO_CONFIG_INT(SvRandomRespawn, sv_randomrespawn, 0, 0, 1, CFGFLAG_SERVER, "Completely randomizes respawns, not considering distance to other players");
+
+MACRO_CONFIG_INT(SvHammerFreeze, sv_hammer_freeze, 0, 0, 1, CFGFLAG_SERVER | CFGFLAG_SAVE, "Whether or not hammering an enemy freezes them")
+MACRO_CONFIG_INT(SvHammerFreezeTime, sv_hammer_freeze_time, 10, 1, 10, CFGFLAG_SERVER | CFGFLAG_SAVE, "The time for which hammering freezes enemies (sv_hammer_freeze must be on)")
 // =====
 
 MACRO_CONFIG_INT(SvRespawnDelayTDM, sv_respawn_delay_tdm, 3, 0, 10, CFGFLAG_SERVER, "Time needed to respawn after death in tdm gametype")
 
 MACRO_CONFIG_INT(SvSpectatorSlots, sv_spectator_slots, 0, 0, MAX_CLIENTS, CFGFLAG_SERVER, "Number of slots to reserve for spectators")
 MACRO_CONFIG_INT(SvTeambalanceTime, sv_teambalance_time, 1, 0, 1000, CFGFLAG_SERVER, "How many minutes to wait before autobalancing teams")
-MACRO_CONFIG_INT(SvInactiveKickTime, sv_inactivekick_time, 3, 0, 1000, CFGFLAG_SERVER, "How many minutes to wait before taking care of inactive players")
+MACRO_CONFIG_INT(SvInactiveKickTime, sv_inactivekick_time, 90, 0, 1000, CFGFLAG_SERVER, "How many seconds to wait before taking care of inactive players")
 MACRO_CONFIG_INT(SvInactiveKick, sv_inactivekick, 1, 0, 2, CFGFLAG_SERVER, "How to deal with inactive players (0=move to spectator, 1=move to free spectator slot/kick, 2=kick)")
 
 MACRO_CONFIG_INT(SvStrictSpectateMode, sv_strict_spectate_mode, 0, 0, 1, CFGFLAG_SERVER, "Restricts information in spectator mode")

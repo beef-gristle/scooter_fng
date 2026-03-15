@@ -114,21 +114,6 @@ void CPlayer::Tick()
 
 	if(!GameServer()->m_World.m_Paused)
 	{
-		// === AFK-to-spectator logic ===
-		const int AFK_SECONDS = 90;
-		if(m_Team != TEAM_SPECTATORS && (Server()->Tick() - m_LastActionTick) > AFK_SECONDS * Server()->TickSpeed())
-		{
-			char aName[MAX_NAME_LENGTH];
-			str_copy(aName, Server()->ClientName(m_ClientID), sizeof(aName));
-			
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "%s is AFK", aName);
-			GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
-
-			// Suppress default join spectators message
-			SetTeam(TEAM_SPECTATORS, false);
-		}
-
 		if(!m_pCharacter && m_Team == TEAM_SPECTATORS && m_SpectatorID == SPEC_FREEVIEW)
 			m_ViewPos -= vec2(clamp(m_ViewPos.x - m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y - m_LatestActivity.m_TargetY, -400.0f, 400.0f));
 
