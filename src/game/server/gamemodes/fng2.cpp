@@ -245,7 +245,7 @@ int CGameControllerFNG2::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 		pVictim->GetPlayer()->m_Stats.m_Selfkills++; // suicide
 	else
 	{
-		if (Weapon == WEAPON_RIFLE || Weapon == WEAPON_GRENADE){
+		if (Weapon == WEAPON_RIFLE || Weapon == WEAPON_GRENADE || (GameServer()->m_Config->m_SvHammerFreeze && Weapon == WEAPON_HAMMER)){
 			if(IsTeamplay() && pVictim->GetPlayer()->GetTeam() == pKiller->GetTeam())
 				pKiller->m_Stats.m_Teamkills++; // teamkill
 			else {
