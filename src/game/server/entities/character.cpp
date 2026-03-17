@@ -1275,7 +1275,7 @@ void CCharacter::DieSpikes(int pPlayerID, int spikes_flag) {
 m_Killer.m_KillerID = -1;
 }
 
-void CCharacter::Hit(int Killer, int Weapon)
+void CCharacter::Hit(int Killer, int Weapon, int seconds)
 {
 	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon);
 	
@@ -1287,7 +1287,7 @@ void CCharacter::Hit(int Killer, int Weapon)
 		Killer, Server()->ClientName(Killer),
 		m_pPlayer->GetCID(), Server()->ClientName(m_pPlayer->GetCID()), Weapon, ModeSpecial);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-	m_Armor = 10;
+	m_Armor = seconds;
 
 	// send the kill message
 	CNetMsg_Sv_KillMsg Msg;
@@ -1343,7 +1343,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		if (m_InvincibleTick == 0) {
 			int freezeTime = (Weapon == WEAPON_HAMMER) ? GameServer()->m_Config->m_SvHammerFreezeTime : g_Config.m_SvHitFreeze;
 			Freeze(freezeTime);
-			Hit(From, Weapon);
+			Hit(From, Weapon, freezeTime);
 
 			// Set who froze me
 			if(From >= 0 && From != m_pPlayer->GetCID())

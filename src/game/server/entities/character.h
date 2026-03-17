@@ -61,7 +61,7 @@ public:
 
 	void DieSpikes(int pPlayerID, int spikes_flag);
 
-	void Hit(int Killer, int Weapon);
+	void Hit(int Killer, int Weapon, int seconds);
 	bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
 	void TakeHammerHit(CCharacter* pFrom);
 
